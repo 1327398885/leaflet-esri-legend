@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>arcgis server地图的图例</title>
+    <link rel="stylesheet" href="src/leaflet/leaflet.css">
+    <link href="https://cdn.bootcss.com/twitter-bootstrap/4.3.1/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="src/leaflet-esri-legend.css">
+    <style>
+        html, body {
+            height: 100%;
+            width: 100%;
+            overflow: hidden;
+        }
+
+        #map {
+            height: 100%;
+            width: 100%;
+            z-index: 1;
+        }
+    </style>
+</head>
+<body>
+
+<div id="map">
+
+</div>
+
+<script src="https://cdn.bootcss.com/jquery/3.4.1/jquery.min.js"></script>
+<script src="https://cdn.bootcss.com/twitter-bootstrap/4.3.0/js/bootstrap.min.js"></script>
+<script src="src/leaflet/leaflet.js"></script>
+<script src="src/leaflet/esri-leaflet.js"></script>
+<script src="src/leaflet/leaflet.ChineseTmsProviders.js"></script>
+<script src="src/leaflet-esri-legend.js"></script>
+<script>
+    /**
+     * 智图地图内容
+     */
+    var normalm1 = L.tileLayer.chinaProvider('Geoq.Normal.Map', {
+        maxZoom: 18,
+        minZoom: 5
+    });
+    var normalm2 = L.tileLayer.chinaProvider('Geoq.Normal.Color', {
+        maxZoom: 18,
+        minZoom: 5
+    });
+    var normalm3 = L.tileLayer.chinaProvider('Geoq.Normal.PurplishBlue', {
+        maxZoom: 18,
+        minZoom: 5
+    });
+    var normalm4 = L.tileLayer.chinaProvider('Geoq.Normal.Gray', {
+        maxZoom: 18,
+        minZoom: 5
+    });
+    var normalm5 = L.tileLayer.chinaProvider('Geoq.Normal.Warm', {
+        maxZoom: 18,
+        minZoom: 5
+    });
+    var normalm6 = L.tileLayer.chinaProvider('Geoq.Normal.Cold', {
+        maxZoom: 18,
+        minZoom: 5
+    });
+    /**
+     * 天地图内容
+     */
+    var normalm = L.tileLayer.chinaProvider('TianDiTu.Normal.Map', {
+            maxZoom: 18,
+            minZoom: 5
+        }),
+        normala = L.tileLayer.chinaProvider('TianDiTu.Normal.Annotion', {
+            maxZoom: 18,
+            minZoom: 5
+        }),
+        imgm = L.tileLayer.chinaProvider('TianDiTu.Satellite.Map', {
+            maxZoom: 18,
+            minZoom: 5
+        }),
+        imga = L.tileLayer.chinaProvider('TianDiTu.Satellite.Annotion', {
+            maxZoom: 18,
+            minZoom: 5
+        });
+    // 地形地图
+    var terrainMap = L.tileLayer.chinaProvider("TianDiTu.Terrain.Map", {});
+    var terrainAnn = L.tileLayer.chinaProvider(
+        "TianDiTu.Terrain.Annotion",
+        {}
+    );
+    var terrainGroup = L.layerGroup([terrainMap, terrainAnn]);
+    var normal = L.layerGroup([normalm, normala]),
+        image = L.layerGroup([imgm, imga]);
+    /**
+     * 谷歌
+     */
+    var normalMap = L.tileLayer.chinaProvider('Google.Normal.Map', {
+            maxZoom: 18,
+            minZoom: 5
+        }),
+        satelliteMap = L.tileLayer.chinaProvider('Google.Satellite.Map', {
+            maxZoom: 18,
+            minZoom: 5
+        });
+    /**
+     * 高德地图
+     */
+    var Gaode = L.tileLayer.chinaProvider('GaoDe.Normal.Map', {
+        maxZoom: 18,
+        minZoom: 5
+    });
+    var Gaodimgem = L.tileLayer.chinaProvider('GaoDe.Satellite.Map', {
+        maxZoom: 18,
+        minZoom: 5
+    });
+    var Gaodimga = L.tileLayer.chinaProvider('GaoDe.Satellite.Annotion', {
+        maxZoom: 18,
+        minZoom: 5
+    });
+    var Gaodimage = L.layerGroup([Gaodimgem, Gaodimga]);
+
+    var baseLayers = {
+        "智图地图": normalm1,
+        // "智图多彩": normalm2,
+        "智图午夜蓝": normalm3,
+        "智图灰色": normalm4,
+        "智图暖色": normalm5,
+        // "智图冷色": normalm6,
+        "天地图": normal,
+        "天地图影像": image,
+        "天地图地形图": terrainGroup,
+        "谷歌地图": normalMap,
+        "谷歌影像": satelliteMap,
+        //"高德地图": Gaode,
+        "高德影像": Gaodimage
+    };
+
+    var map = L.map("map", {
+        renderer: L.canvas(),
+        center: [31.520, 118.587],
+        zoom: 11,
+        layers: [image],
+        //zoomControl: false,//放大缩小控件
+        attributionControl: false,//关闭右下角标识
+        editable: true//允许编辑
+    });
+
+    //将图层组控件添加到地图中
+    L.control.layers(baseLayers, null).addTo(map);
+    //比例尺
+    L.control.scale({maxWidth: 100, metric: true, imperial: false}).addTo(map);
+
+
+    //自己arcgis server发布的地图(mapServer)
+    var url="localhost:6080/arcgis/rest/services/dangtu/Mn/MapServer";
+
+    new L.esri.dynamicMapLayer({
+        url: url,
+        opacity: 0.7
+    }).addTo(map);
+
+    //获取图例
+    Legend(url);
+
+</script>
+</body>
+</html>
